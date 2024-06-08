@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina de Maria</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #002655;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .navbar {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+        #container {
+            background-color: rgb(15, 25, 78);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            margin-top: 100px; 
+        }
+        #book-image {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        #book-form button {
+            color: #000000; 
+        }
+    
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Información del Libro</h1>
+        <form id="book-form">
+            <label for="book-title">Título del Libro:</label>
+            <input type="text" id="book-title" required>
+            <button type="submit">Buscar</button>
+        </form>
+        <div id="book-info" style="display: none;">
+            <img id="book-image" src="" alt="Portada del Libro">
+            <h2 id="book-title-output"></h2>
+            <p id="book-author"></p>
+            <p id="book-published-date"></p>
+            <p id="book-page-count"></p>
+            <p id="book-description"></p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('book-form');
+        const bookInfo = document.getElementById('book-info');
+        const bookTitleOutput = document.getElementById('book-title-output');
+        const bookAuthor = document.getElementById('book-author');
+        const bookPublishedDate = document.getElementById('book-published-date');
+        const bookPageCount = document.getElementById('book-page-count');
+        const bookDescription = document.getElementById('book-description');
+        const bookImage = document.getElementById('book-image');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const bookTitle = document.getElementById('book-title').value;
+            const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(bookTitle)}`);
+            const data = await response.json();
+            if (data.items && data.items.length > 0) {
+                const book = data.items[0].volumeInfo;
+                bookInfo.style.display = 'block';
+                bookTitleOutput.textContent = book.title;
+                bookAuthor.textContent = 'Autor: ' + (book.authors ? book.authors.join(', ') : 'Desconocido');
+                bookPublishedDate.textContent = 'Año de Publicación: ' + (book.publishedDate ? book.publishedDate : 'Desconocido');
+                bookPageCount.textContent = 'Número de Páginas: ' + (book.pageCount ? book.pageCount : 'Desconocido');
+                bookDescription.textContent = 'Descripción: ' + (book.description ? book.description : 'No disponible');
+                bookImage.src = book.imageLinks ? book.imageLinks.thumbnail : '';
+            } else {
+                bookInfo.style.display = 'none';
+                alert('No se encontró información para ese libro.');
+            }
+        });
+    </script>
+</body>
+</html>
